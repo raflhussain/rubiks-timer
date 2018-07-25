@@ -1,0 +1,13 @@
+{
+  "name": "rubiks",
+  "version": "1.0.0",
+  "description": "Rubik's solve timer (CLI)",
+  "main": "server.js",
+  "author": "rxflhussxin",
+  "license": "MIT",
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "express": "^4.16.3",
+    "mongoose": "^5.2.4"
+  }
+}
