@@ -1,5 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const dbConfig = require('./config/database.config.js');
+const MongoClient = require('mongodb').MongoClient;
 
 // Create express app and define port
 const app = express();
@@ -12,8 +14,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
 // Database configuration
-const dbConfig = require('./config/database.config.js');
-const MongoClient = require('mongodb').MongoClient;
 var db;
 MongoClient.connect(dbConfig.url, (err, client) => {
     if (err) {
@@ -22,6 +22,7 @@ MongoClient.connect(dbConfig.url, (err, client) => {
         process.exit();
     }
     db = client.db('rubiks');
+	times = db.collection('times');
     console.log('Successfully connected to the database.');
 
     // Listen for requests
@@ -30,29 +31,49 @@ MongoClient.connect(dbConfig.url, (err, client) => {
     });
 });
 
-const times = [ { username: 'rxflhussxin', time: '01:03' },
-              { username: 'eamal27', time: '00:49' } ];
-
-const test = { username: 'test', time: '00:00' };
-
 // Main route
 app.get('/', (req, res) => {
     res.json({'message': "Welcome to the Rubik's timer. Improve your solve time!"});
 });
 
-app.post('/times', (req, res) => {
-    db.collection('times').save(test, (err, result) => {
-        if (err) return console.log(err);
+// Add new time
+app.post('/addTime', (req, res) => {
+	times.insertOne(req.body, (err, result) => {
+		if (err) return console.log(err);
 
-        console.log('Time added to database.');
-        res.redirect('/');
-    });
+		console.log('Added to database:');
+		console.log(req.body);
+		res.redirect('/');
+	});
 });
 
-app.get('/times', (req, res) => {
-    var cursor = db.collection('times').find().toArray( (err, results) => {
+// Get complete list of times
+app.get('/getTimes', (req, res) => {
+    var cursor = times.find().toArray( (err, results) => {
         console.log(results);
         res.json(results);
     });
-    //res.redirect('/');
+});
+
+// Get user specific times
+app.get('/getTime', (req, res) => {
+    var cursor = times.find(req.body).toArray( (err, results) => {
+        console.log(results);
+        res.json(results);
+    });
+});
+
+// Clear all times
+app.get('/removeAll', (req, res) => {
+    var cursor = times.remove({});
+	console.log('Database cleared.');
+	res.redirect('/');
+});
+
+// Remove single time 
+app.get('/removeTime', (req, res) => {
+    var cursor = times.remove(req.body);
+	console.log('Time removed:');
+	console.log(req.body);
+	res.redirect('/');
 });
