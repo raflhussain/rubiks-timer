@@ -1,3 +1,4 @@
+#!/bin/bash
 BEGIN=$(date +%s)
 
 echo Starting Rubiks Timer for $USER...
@@ -18,12 +19,17 @@ while true; do
     read -t 0.25 -N 1 input
     # Any key pressed (except spacebar/enter)
     if [[ $input  ]]; then
-        # Output time to file
-        echo $USER $TIME >> solvetimes.txt
-        echo
+        
+        # format duration for post request
+        MINS=$(printf %02d $MINS)
+        SECS=$(printf %02d $SECS)
+        DURATION=$MINS:$SECS
+
+        # curl HTTP POST request
+        curl -d "username=$USER&duration=$MINS:$SECS" -X POST http://localhost:3000/addTime
         # Reintroduce prompt on new line
         echo
-        echo Time: $MINS minutes, $SECS seconds
+        echo Time added to database for $USER: $MINS minutes, $SECS seconds
         echo
         break 
     fi
