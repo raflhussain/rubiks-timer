@@ -56,8 +56,27 @@ app.get('/getTimes', (req, res) => {
 });
 
 // Get user specific times
+//app.get('/getTime:<username>', (req, res) => {
 app.get('/getTime', (req, res) => {
     var cursor = times.find(req.body).toArray( (err, results) => {
+        console.log(results);
+        res.json(results);
+    });
+});
+
+// Get user personal record
+app.get('/getBestTime', (req, res) => {
+    var cursor = times.find(req.body).toArray( (err, results) => {
+		// find greatest value in array
+        console.log(results);
+        res.json(results);
+    });
+});
+
+// Get record times
+app.get('/getBestTime', (req, res) => {
+    var cursor = times.find({}).toArray( (err, results) => {
+		// find grratest values in array
         console.log(results);
         res.json(results);
     });
